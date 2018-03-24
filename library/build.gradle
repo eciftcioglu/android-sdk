@@ -2,6 +2,12 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 26
+    buildToolsVersion '26.0.2'
+
+    lintOptions {
+        abortOnError false
+    }
+
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 26
@@ -18,7 +24,8 @@ android {
 }
 
 repositories {
-    mavenLocal()
+    mavenCentral()
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
 }
 
 dependencies {
@@ -28,6 +35,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
+    compile group: 'co.buybuddy', name: 'buybuddy-java-sdk', version: '1.0.15-SNAPSHOT', changing: true
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
-    compile group: 'co.buybuddy', name: 'buybuddy-java-sdk', version:'1.0.1-SNAPSHOT'
+    compile 'com.google.dagger:dagger:2.15'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.15'
 }
