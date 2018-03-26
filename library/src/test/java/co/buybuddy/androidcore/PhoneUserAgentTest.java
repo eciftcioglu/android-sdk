@@ -2,7 +2,7 @@ package co.buybuddy.androidcore;
 
 import org.junit.Test;
 
-import co.buybuddy.androidcore.authentication.keystore.PhoneUserAgent;
+import co.buybuddy.androidcore.authentication.keystore.networking.useragent.PhoneUserAgent;
 
 import static junit.framework.Assert.assertNotNull;
 
