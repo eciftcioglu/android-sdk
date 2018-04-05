@@ -1,4 +1,4 @@
-package co.buybuddy.androidcore.authentication.keystore.networking.useragent;
+package co.buybuddy.androidcore.networking.http.ua;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -11,21 +11,29 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import co.buybuddy.androidcore.ContextProvider;
 import co.buybuddy.networking.http.ua.CanonicalUserAgent;
 
 public class PhoneUserAgent extends CanonicalUserAgent {
 
-    @Inject private Context context;
     private String carrierName;
     private String countryIso;
     private String countryCode;
     private TelephonyManager manager;
+    private ContextProvider contextProvider;
 
     /**
      * Initializes the 'PhoneUserAgent' class.
      */
-    public PhoneUserAgent() {
-        manager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+    @Inject
+    public PhoneUserAgent(ContextProvider contextProvider) {
+        this.contextProvider = contextProvider;
+
+        try {
+            manager = (TelephonyManager) contextProvider.getContext().getSystemService(Context.TELEPHONY_SERVICE);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -35,6 +43,7 @@ public class PhoneUserAgent extends CanonicalUserAgent {
         if (carrierName == null) {
             carrierName = manager.getSimOperatorName();
         }
+
         return carrierName;
     }
 
@@ -45,6 +54,7 @@ public class PhoneUserAgent extends CanonicalUserAgent {
         if (countryIso == null) {
             countryIso = manager.getSimCountryIso();
         }
+
         return countryIso;
     }
 
@@ -55,27 +65,28 @@ public class PhoneUserAgent extends CanonicalUserAgent {
         if (countryCode == null) {
             countryCode = manager.getNetworkCountryIso();
         }
+
         return countryCode;
     }
 
     /**
      * Information about the users current app name.
      */
-    public String getAppName() {
-        ApplicationInfo applicationInfo = context.getApplicationInfo();
-        int stringId = applicationInfo.labelRes;
+    public String getAppName() throws Exception {
+        final ApplicationInfo applicationInfo = contextProvider.getContext().getApplicationInfo();
+        final int stringId = applicationInfo.labelRes;
 
-        return stringId == 0 ? applicationInfo.nonLocalizedLabel.toString() : context.getString(stringId);
+        return stringId == 0 ? applicationInfo.nonLocalizedLabel.toString() : contextProvider.getContext().getString(stringId);
     }
 
     /**
      * Information about the users current app version.
      */
-    public String getAppVersion() {
+    public String getAppVersion() throws Exception {
         PackageInfo packageInfo = null;
 
         try {
-            packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            packageInfo = contextProvider.getContext().getPackageManager().getPackageInfo(contextProvider.getContext().getPackageName(), 0);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
@@ -86,14 +97,23 @@ public class PhoneUserAgent extends CanonicalUserAgent {
         return version != null ? version.toString() : null;
     }
 
+    public ContextProvider getContextProvider() {
+        return contextProvider;
+    }
+
     @Override
     protected List<VersionPair> generateVersionPairs() {
         super.generateVersionPairs();
         List<VersionPair> versionPairs = new ArrayList<>();
 
         versionPairs.add(new VersionPair(getCarrierName(), getCountryCode()));
-        versionPairs.add(new VersionPair(getAppName(), getAppVersion()));
+        try {
+            versionPairs.add(new VersionPair(getAppName(), getAppVersion()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return versionPairs;
     }
+
 }

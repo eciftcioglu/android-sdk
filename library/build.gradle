@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 27
     buildToolsVersion '26.0.2'
 
     lintOptions {
@@ -10,15 +10,20 @@ android {
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 26
+        targetSdkVersion 22
+        multiDexEnabled true
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled false
         }
     }
 }
@@ -29,14 +34,22 @@ repositories {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:22.2.1'
     testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'org.mockito:mockito-android:2.16.0'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:appcompat-v7:27.1.0'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    implementation 'co.buybuddy:buybuddy-java-sdk:1.0.17-SNAPSHOT'
+    implementation 'org.apache.commons:commons-lang3:3.7'
 
-    compile group: 'co.buybuddy', name: 'buybuddy-java-sdk', version: '1.0.15-SNAPSHOT', changing: true
-    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
-    compile 'com.google.dagger:dagger:2.15'
+    androidTestCompile('com.android.support:multidex-instrumentation:1.0.3') {
+        exclude group: 'com.android.support', module: 'multidex'
+    }
+
+    implementation 'com.google.dagger:dagger-android:2.15'
+    implementation 'com.google.dagger:dagger-android-support:2.15'
+
+    annotationProcessor 'com.google.dagger:dagger-android-processor:2.15'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.15'
 }
